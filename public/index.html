@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Outlandish Live</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Outlandish">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#E7E8E4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141A1F" media="(prefers-color-scheme: dark)">
+<style>
+:root{
+  --bg:#E7E8E4; --surface:#FFFFFF; --ink:#1E2A34; --muted:#66727C; --line:#D3D6D1;
+  --gold:#A87C22; --gold-soft:#F3E7C9; --on-gold:#FFFFFF; --danger:#B3261E; --field:#F5F6F3;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#141A1F; --surface:#1D252C; --ink:#E8EAE6; --muted:#98A2AA; --line:#2E3942;
+    --gold:#D4A94B; --gold-soft:#3A3120; --on-gold:#1A1406; --danger:#F2867E; --field:#172027;
+  }
+  .logo{filter:invert(1)}
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+
+/* login */
+#login{display:flex;min-height:100vh;min-height:100dvh;align-items:center;justify-content:center;padding:24px 16px}
+.login-box{width:100%;max-width:380px}
+.login-head{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:22px}
+.login-head .logo{display:block;width:min(240px,64vw);aspect-ratio:1}
+.sub{color:var(--muted);font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+label.f{display:block;font-size:14px;color:var(--muted);margin:0 0 4px}
+.mt{margin-top:12px}
+.field{width:100%;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:46px}
+.field:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+textarea.field{min-height:80px;resize:vertical}
+.remember{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:15px;cursor:pointer}
+.remember input{width:22px;height:22px;accent-color:var(--gold);margin:0}
+.err{color:var(--danger);font-size:14px;min-height:20px;margin:8px 0 0}
+.btn{border:0;border-radius:12px;padding:14px 18px;font-weight:600;font-size:16px;cursor:pointer;min-height:50px;margin-top:14px;background:var(--gold);color:var(--on-gold);width:100%}
+.btn:disabled{opacity:.6}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:none;color:var(--danger);border:1px solid var(--line)}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0;text-align:center}
+/* intro som i AURUM: logoet zoomer ind på plads, så glider login-felterne frem */
+.login-head .logo{animation:introIn 1.1s cubic-bezier(.16,1,.3,1) both}
+@keyframes introIn{0%{transform:scale(1.35) rotate(-12deg);opacity:0}35%{opacity:1}100%{transform:none;opacity:1}}
+.login-head .sub,#loginForm{animation:riseIn .7s .55s cubic-bezier(.16,1,.3,1) both}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.login-head .logo,.login-head .sub,#loginForm{animation:none}}
+
+/* app */
+main{max-width:640px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom,0px))}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:48px;height:48px;flex:none}
+header h1{margin:0;font-size:24px;letter-spacing:-.01em;line-height:1.15}
+header p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.link{border:0;background:none;color:var(--gold);font-weight:600;padding:6px 0;cursor:pointer;white-space:nowrap}
+main section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}
+h2{margin:0 0 4px;font-size:19px}
+h3{margin:18px 0 6px;font-size:16px}
+main .note{margin:0 0 12px;font-size:14px;text-align:left}
+ul{margin:0;padding-left:20px}
+li{margin:4px 0}
+.empty{color:var(--muted);font-style:italic}
+.add{display:block;width:100%;margin-top:12px;border:1px dashed var(--line);background:none;border-radius:10px;padding:10px;color:var(--gold);font-weight:600;cursor:pointer}
+.editable{cursor:pointer}
+
+/* infofelt øverst: hvor er vi, klokken og vejret */
+.now{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-top:14px}
+.now .city{font-weight:700;font-size:18px}
+.now .clock{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.now .wx{text-align:right;grid-row:span 2}
+.now .temp{font-size:26px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.now .temp span{font-size:24px;margin-right:4px}
+.now .wx-sub{color:var(--muted);font-size:13px;margin-top:2px}
+
+/* faner nederst, som i AURUM */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{flex:1;max-width:140px;border:0;background:none;padding:12px 2px 14px;font-weight:600;font-size:min(15px,3.7vw);color:var(--muted);cursor:pointer;border-top:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-top-color:var(--gold)}
+
+/* nu og næste */
+.next{background:var(--gold-soft);border-color:transparent}
+.next .label{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.next .what{font-size:21px;font-weight:700;margin-top:2px;line-height:1.25}
+.next .when{color:var(--muted);margin-top:2px}
+.next .then{border-top:1px solid var(--line);margin-top:12px;padding-top:10px;font-size:15px;color:var(--muted)}
+.next .then b{color:var(--ink);font-weight:600}
+
+/* dage og program */
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;margin-top:16px}
+.days button{border:0;background:none;border-radius:9px;padding:8px 2px;cursor:pointer;color:var(--muted);line-height:1.2;display:flex;flex-direction:column;align-items:center}
+.days button b{font-size:20px;color:var(--ink)}
+.days button span{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.days button[aria-pressed="true"]{background:var(--gold);color:var(--on-gold)}
+.days button[aria-pressed="true"] b{color:var(--on-gold)}
+.days button.today span::after{content:" •"}
+.program{list-style:none;padding:0}
+.program > li{margin:0}
+.item{display:grid;grid-template-columns:56px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.program > li:last-child .item{border-bottom:0;padding-bottom:0}
+.item .time{font-weight:600;font-variant-numeric:tabular-nums;color:var(--gold)}
+.item .title{font-weight:600}
+.item .details{color:var(--muted);font-size:15px;margin-top:2px}
+.flight{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:var(--field)}
+.flight-head{display:flex;justify-content:space-between;gap:10px;font-weight:600}
+.flight-no{color:var(--gold);white-space:nowrap}
+.flight-times{display:flex;gap:8px;align-items:baseline;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:4px}
+.flight-times span{color:var(--muted);font-size:16px;font-weight:400}
+.flight-meta{color:var(--muted);font-size:14px;margin-top:4px}
+.flight-day{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:14px}
+
+/* hoteller */
+.hotel{padding:4px 0}
+.hotel + .hotel{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.hotel-city{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.hotel-name{font-weight:700;font-size:18px}
+.hotel-dates{color:var(--muted);font-size:15px}
+.hotel-meta{color:var(--muted);font-size:14px;margin-top:4px}
+.tonight{display:flex;gap:8px;align-items:baseline;color:var(--muted);font-size:15px;margin:2px 0 6px}
+.tonight b{color:var(--ink);font-weight:600}
+
+/* kontakter og info */
+.contact{padding:4px 0}
+.contact + .contact{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.contact-name{font-weight:600}
+.contact-phone{color:var(--muted)}
+.buttons{display:flex;gap:10px;margin-top:10px}
+.buttons a{flex:1;text-align:center;padding:10px;border-radius:10px;text-decoration:none;font-weight:600;background:var(--gold);color:var(--on-gold);border:1px solid var(--gold)}
+.buttons a.secondary{background:transparent;color:var(--gold)}
+.checklist{list-style:none;padding:0}
+.checklist label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.checklist input{margin-top:4px;width:18px;height:18px;accent-color:var(--gold)}
+.checklist input:checked + span{color:var(--muted);text-decoration:line-through}
+
+/* fly-menu og check-in-hjælp */
+.menu{display:grid;gap:10px}
+.menu .btn{margin-top:0}
+.ci-head{color:var(--muted);margin:-6px 0 10px}
+.ci-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ci-row .k{font-size:13px;color:var(--muted)}
+.ci-row .v{font-weight:600;font-size:17px;word-break:break-all;font-variant-numeric:tabular-nums}
+.copy{border:1px solid var(--gold);background:none;color:var(--gold);border-radius:9px;padding:7px 12px;font-weight:600;cursor:pointer;min-width:84px}
+.copy.done{background:var(--gold);color:var(--on-gold)}
+.ci-person{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-top:16px}
+.ci-link{display:block;text-align:center;text-decoration:none;margin-top:14px}
+
+/* rediger-dialog */
+dialog{border:0;border-radius:16px;background:var(--surface);color:var(--ink);width:min(92vw,480px);padding:18px;max-height:88vh;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin-bottom:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:13px;color:var(--muted);margin:4px 0 0}
+</style>
+</head>
+<body>
+<section id="login" aria-label="Log på" hidden>
+  <div class="login-box">
+    <div class="login-head">
+      <h1 style="margin:0"><img class="logo" src="logo.svg" alt="Outlandish"></h1>
+      <div class="sub">Live · 22.–26. oktober 2026</div>
+    </div>
+    <form class="card" id="loginForm">
+      <label class="f" for="lUser">Brugernavn</label>
+      <input class="field" id="lUser" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label class="f mt" for="lPass">Password</label>
+      <input class="field" id="lPass" type="password" autocomplete="current-password" required>
+      <label class="remember"><input type="checkbox" id="lRemember" checked> Husk mit brugernavn</label>
+      <p class="err" id="lErr" role="alert"></p>
+      <button class="btn" id="lLogin" type="submit">Log på</button>
+      <p class="note">Har du ikke en bruger? Spørg Luke.</p>
+    </form>
+  </div>
+</section>
+
+<main id="app" hidden>
+  <header>
+    <div class="brand">
+      <img class="logo" src="logo.svg" alt="">
+      <div>
+        <h1>Outlandish Live</h1>
+        <p>22.–26. oktober 2026</p>
+      </div>
+    </div>
+    <button class="link" id="logout" type="button">Log ud</button>
+  </header>
+
+  <div class="now" id="now" hidden>
+    <div class="city" id="nowCity"></div>
+    <div class="wx" id="nowWx"></div>
+    <div class="clock" id="nowClock"></div>
+  </div>
+
+  <div id="tab-program" role="tabpanel">
+    <section class="next" id="next" aria-live="polite"></section>
+    <nav class="days" id="days" aria-label="Vælg dag"></nav>
+    <section>
+      <h2 id="day-title">Program</h2>
+      <div class="tonight" id="tonight" hidden></div>
+      <ul class="program" id="program"></ul>
+      <button class="add" id="add-item" type="button" hidden>+ Tilføj programpunkt</button>
+      <button class="add" id="add-flight-day" type="button" hidden>+ Tilføj fly</button>
+    </section>
+  </div>
+
+  <div id="tab-fly" role="tabpanel" hidden>
+    <section>
+      <h2>Alle fly</h2>
+      <div id="all-flights"></div>
+      <button class="add" id="add-flight" type="button" hidden>+ Tilføj fly</button>
+    </section>
+  </div>
+
+  <div id="tab-hotel" role="tabpanel" hidden>
+    <section>
+      <h2>Hoteller</h2>
+      <div id="hotels"></div>
+      <button class="add" id="add-hotel" type="button" hidden>+ Tilføj hotel</button>
+    </section>
+  </div>
+
+  <div id="tab-kontakter" role="tabpanel" hidden>
+    <section>
+      <h2>Kontakter</h2>
+      <div id="contacts"></div>
+      <button class="add" id="add-contact" type="button" hidden>+ Tilføj kontakt</button>
+    </section>
+  </div>
+
+  <div id="tab-info" role="tabpanel" hidden>
+    <section>
+      <h2>Åbne punkter</h2>
+      <p class="note">Afkrydsninger gemmes kun på din egen telefon.</p>
+      <ul class="checklist" id="open-items"></ul>
+    </section>
+
+    <section>
+      <h2>Ved ankomst</h2>
+      <ul>
+        <li>Visumfrit for danskere i begge lande (op til 30 dage).</li>
+        <li>Usbekistan: man skal registreres inden for 3 dage. Hotellet gør det normalt automatisk.</li>
+        <li>Køb lokalt SIM-kort i lufthavnen. Yandex Go virker til taxa i begge lande.</li>
+        <li>Hav kontanter: usbekiske som og kasakhiske tenge.</li>
+        <li>Begge lande er GMT+5. Danmark skifter til vintertid søndag 25/10.</li>
+        <li>Vejr: ca. 5–18 grader, koldest i Astana. Tag varm jakke med.</li>
+      </ul>
+    </section>
+
+    <div id="private-sections"></div>
+    <button class="add" id="add-section" type="button" hidden>+ Tilføj afsnit</button>
+  </div>
+</main>
+
+<nav class="tabs" id="tabs" role="tablist" hidden>
+  <button type="button" role="tab" data-tab="program" aria-selected="true">Program</button>
+  <button type="button" role="tab" data-tab="fly" aria-selected="false">Fly</button>
+  <button type="button" role="tab" data-tab="hotel" aria-selected="false">Hotel</button>
+  <button type="button" role="tab" data-tab="kontakter" aria-selected="false">Kontakter</button>
+  <button type="button" role="tab" data-tab="info" aria-selected="false">Info</button>
+</nav>
+
+<dialog id="flightMenu">
+  <h2 id="fmTitle"></h2>
+  <div class="menu">
+    <button class="btn" id="fmCheckin" type="button">Check-in-hjælp</button>
+    <button class="btn ghost" id="fmEdit" type="button">Rediger fly</button>
+    <button class="btn ghost" id="fmClose" type="button">Luk</button>
+  </div>
+</dialog>
+
+<dialog id="checkin">
+  <h2 id="ciTitle"></h2>
+  <p class="ci-head" id="ciSub"></p>
+  <div id="ciBody"></div>
+  <button class="btn ghost" id="ciClose" type="button">Luk</button>
+</dialog>
+
+<dialog id="editor">
+  <form id="editForm" method="dialog">
+    <h2 id="editTitle"></h2>
+    <div id="editFields"></div>
+    <p class="err" id="editErr" role="alert"></p>
+    <button class="btn" id="editSave" type="submit">Gem</button>
+    <button class="btn ghost" id="editCancel" type="button">Annuller</button>
+    <button class="btn danger" id="editDelete" type="button" hidden>Slet</button>
+  </form>
+</dialog>
+
+<script src="vendor/supabase-js-2.45.4/supabase.js"></script>
+<script>
+  // Tilføj åbne punkter her. Hvert punkt skal have et unikt id.
+  const OPEN_ITEMS = [
+    // { id: "eksempel", text: "Bekræft hotel i Astana" },
+  ];
+
+  const STORAGE_KEY = "outlandish-live-2026-checked";
+  let checked = {};
+  try { checked = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) {}
+
+  const list = document.getElementById("open-items");
+  if (OPEN_ITEMS.length === 0) {
+    list.innerHTML = '<li class="empty">Ingen åbne punkter lige nu.</li>';
+  }
+  for (const item of OPEN_ITEMS) {
+    const li = document.createElement("li");
+    const label = document.createElement("label");
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.checked = !!checked[item.id];
+    box.addEventListener("change", () => {
+      checked[item.id] = box.checked;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(checked)); } catch (e) {}
+    });
+    const span = document.createElement("span");
+    span.textContent = item.text;
+    label.append(box, span);
+    li.append(label);
+    list.append(li);
+  }
+
+  // Login via Supabase. Brugernavne omsættes til interne login-adresser (der sendes ingen mails).
+  // Kontakter, program, fly og riders ligger i Supabase og kan kun læses af godkendte brugere (RLS).
+  // Kun admins (private.admins) kan rette.
+  const SUPABASE_URL = "https://bjdglyurrpdnjgyfopek.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_7rEkE6x7gwGbS1s5LU8o3A_vjhkk21T";
+  const EMAIL_DOMAIN = "outlandish-live.dk";
+
+  // Login-skærmen skal altid komme først, når appen åbnes: sessionen gemmes kun,
+  // til appen lukkes. "Husk mit brugernavn" udfylder bare brugernavnet næste gang.
+  const USERNAME_KEY = "outlandish-username";
+  try { localStorage.removeItem("outlandish-remember"); } catch (e) {}
+  const authStorage = {
+    getItem: (k) => { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
+    setItem: (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) {} },
+    removeItem: (k) => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (e) {} },
+  };
+  // Ryd sessioner, som en tidligere udgave gemte permanent.
+  try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith("sb-")) localStorage.removeItem(k);
+  } catch (e) {}
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { storage: authStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+  });
+
+  const el = (id) => document.getElementById(id);
+  function make(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+
+  // ---------- tid ----------
+  const DAYS = ["2026-10-22", "2026-10-23", "2026-10-24", "2026-10-25", "2026-10-26"];
+  const WEEKDAYS = ["søndag", "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag"];
+  const MONTHS = ["januar", "februar", "marts", "april", "maj", "juni", "juli",
+    "august", "september", "oktober", "november", "december"];
+  // Tider skrives som "14:30" (lokal tid, GMT+5) eller med zone: "14:55 DK", "19:15 TR".
+  const LOCAL_TZ = "UZ";
+  const DK_WINTER = Date.UTC(2026, 9, 25, 1); // Danmark skifter til vintertid 25/10 kl. 03 (01 UTC)
+
+  const localDate = (iso) => new Date(iso + "T12:00:00");
+  const capital = (s) => s[0].toUpperCase() + s.slice(1);
+  function todayIso() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  function parseTime(text) {
+    const m = /(\d{1,2})[:.](\d{2})(?:\s*([A-Za-z]{2}))?/.exec(text || "");
+    return m ? { h: +m[1], m: +m[2], tz: (m[3] || LOCAL_TZ).toUpperCase() } : null;
+  }
+  function instant(dayIso, text) {
+    const t = parseTime(text);
+    if (!t) return null;
+    const [y, mo, d] = dayIso.split("-").map(Number);
+    const guess = Date.UTC(y, mo - 1, d, t.h, t.m);
+    const offset = { UZ: 5, KZ: 5, TR: 3, DK: guess - 2 * 3600e3 < DK_WINTER ? 2 : 1 }[t.tz] ?? 5;
+    return new Date(guess - offset * 3600e3);
+  }
+  const minutesOf = (text) => { const t = parseTime(text); return t ? t.h * 60 + t.m : -1; };
+  function untilText(ms) {
+    const min = Math.round(ms / 60000);
+    if (min < 1) return "nu";
+    if (min < 60) return `om ${min} min`;
+    const h = Math.floor(min / 60), rest = min % 60;
+    if (h < 24) return rest ? `om ${h} t ${rest} min` : `om ${h} t`;
+    const days = Math.round(h / 24);
+    return days === 1 ? "i morgen" : `om ${days} dage`;
+  }
+  function dayLabel(iso) {
+    const d = localDate(iso);
+    return `${capital(WEEKDAYS[d.getDay()])} ${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+  }
+
+  // ---------- data ----------
+  let schedule = [], flights = [], contacts = [], sections = [], hotels = [], loadError = null, isAdmin = false;
+  const DAY_KEY = "outlandish-day", TAB_KEY = "outlandish-tab";
+  let currentDay = DAYS[0];
+
+  async function loadData() {
+    const [c, s, p, f, h, a] = await Promise.all([
+      db.from("contacts").select("id, name, role, phone").order("position"),
+      db.from("private_sections").select("slug, title, items").order("position"),
+      db.from("schedule_items").select("id, day, time, title, details").order("day").order("position"),
+      db.from("flights")
+        .select("id, day, flight_no, airline, from_place, to_place, departs, arrives, booking_ref, passengers, notes, checkin_url")
+        .order("day").order("position"),
+      db.from("hotels")
+        .select("id, city, name, address, check_in, check_out, phone, booking_ref, link, notes")
+        .order("check_in"),
+      db.rpc("am_i_admin"),
+    ]);
+    contacts = c.data || [];
+    schedule = p.data || [];
+    flights = f.data || [];
+    hotels = h.data || [];
+    isAdmin = a.data === true;
+    sections = s.data || [];
+    loadError = c.error || s.error || p.error || f.error || h.error;
+    renderAll();
+  }
+
+  function renderAll() {
+    for (const id of ["add-item", "add-flight-day", "add-flight", "add-contact", "add-section", "add-hotel"]) el(id).hidden = !isAdmin;
+    renderDays();
+    renderNext();
+    renderNow();
+    renderAllFlights();
+    renderContacts();
+    renderHotels();
+    renderSections();
+  }
+
+  // ---------- nu og næste ----------
+  function events() {
+    const list = [];
+    for (const f of flights) {
+      const at = instant(f.day, f.departs);
+      if (at) list.push({ at, day: f.day, title: `✈ ${f.from_place} → ${f.to_place}`, when: `Afgang ${f.departs}` });
+    }
+    for (const i of schedule) {
+      const at = instant(i.day, i.time);
+      if (at) list.push({ at, day: i.day, title: i.title, when: `Kl. ${i.time}` });
+    }
+    return list.sort((a, b) => a.at - b.at);
+  }
+
+  function renderNext() {
+    const box = el("next");
+    box.replaceChildren();
+    const now = Date.now();
+    const upcoming = events().filter((e) => e.at > now);
+    if (!upcoming.length) {
+      box.hidden = !events().length;
+      box.append(make("div", "Turen er slut", "label"), make("div", "Tak for nu – god tur hjem!", "what"));
+      return;
+    }
+    box.hidden = false;
+    const [next, then] = upcoming;
+    box.append(
+      make("div", `Næste · ${untilText(next.at - now)}`, "label"),
+      make("div", next.title, "what"),
+      make("div", `${dayLabel(next.day)} · ${next.when}`, "when"),
+    );
+    if (then) {
+      const p = make("div", null, "then");
+      p.append("Derefter: ", make("b", then.title), ` · ${then.when}`);
+      box.append(p);
+    }
+    box.classList.add("editable");
+    box.onclick = () => selectDay(next.day);
+  }
+  setInterval(() => { if (!el("app").hidden) { renderNext(); renderNow(); } }, 30000);
+
+  // ---------- hvor er vi, klokken og vejret ----------
+  // Byen regnes ud fra det sidste fly, der er landet. Vejret kommer fra Open-Meteo (ingen persondata).
+  const PLACES = {
+    "København": { lat: 55.676, lon: 12.568, tz: "Europe/Copenhagen" },
+    "Istanbul": { lat: 41.01, lon: 28.98, tz: "Europe/Istanbul" },
+    "Tashkent": { lat: 41.30, lon: 69.24, tz: "Asia/Tashkent" },
+    "Astana": { lat: 51.17, lon: 71.45, tz: "Asia/Almaty" },
+    "Almaty": { lat: 43.24, lon: 76.89, tz: "Asia/Almaty" },
+  };
+  const WEATHER = [
+    [[0], "☀️", "klart"], [[1, 2], "🌤️", "let skyet"], [[3], "☁️", "overskyet"], [[45, 48], "🌫️", "tåge"],
+    [[51, 53, 55, 56, 57], "🌦️", "støvregn"], [[61, 63, 65, 66, 67, 80, 81, 82], "🌧️", "regn"],
+    [[71, 73, 75, 77, 85, 86], "🌨️", "sne"], [[95, 96, 99], "⛈️", "torden"],
+  ];
+  const describe = (code) => WEATHER.find(([codes]) => codes.includes(code)) || [[], "🌡️", ""];
+  const weatherCache = {};
+
+  function currentPlace() {
+    const now = Date.now();
+    let place = "København";
+    const landed = flights
+      .map((f) => {
+        const dep = instant(f.day, f.departs);
+        let arr = instant(f.day, f.arrives);
+        if (dep && arr && arr < dep) arr = new Date(arr.getTime() + 864e5); // lander næste dag
+        return { to: f.to_place, arr };
+      })
+      .filter((x) => x.arr && x.arr <= now)
+      .sort((a, b) => a.arr - b.arr);
+    if (landed.length) place = landed[landed.length - 1].to;
+    return PLACES[place] ? place : "København";
+  }
+
+  const clockIn = (tz) => new Intl.DateTimeFormat("da-DK", { timeZone: tz, hour: "2-digit", minute: "2-digit" }).format(new Date());
+
+  function renderNow() {
+    const name = currentPlace();
+    const p = PLACES[name];
+    el("now").hidden = false;
+    el("nowCity").textContent = name;
+    el("nowClock").textContent = p.tz === "Europe/Copenhagen"
+      ? `Klokken er ${clockIn(p.tz)}`
+      : `Kl. ${clockIn(p.tz)} lokal · ${clockIn("Europe/Copenhagen")} i DK`;
+    loadWeather(name);
+  }
+
+  async function loadWeather(name) {
+    const cached = weatherCache[name];
+    if (cached && Date.now() - cached.at < 15 * 60e3) return showWeather(cached.data);
+    const p = PLACES[name];
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}` +
+        "&current=temperature_2m,weather_code,wind_speed_10m" +
+        "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      weatherCache[name] = { at: Date.now(), data };
+      if (currentPlace() === name) showWeather(data);
+    } catch (e) {
+      el("nowWx").replaceChildren(make("div", "Vejret kan ikke hentes", "wx-sub"));
+    }
+  }
+
+  function showWeather(data) {
+    const c = data.current || {}, d = data.daily || {};
+    const [, icon, text] = describe(c.weather_code);
+    const temp = make("div", null, "temp");
+    temp.append(make("span", icon), `${Math.round(c.temperature_2m)}°`);
+    const parts = [
+      d.temperature_2m_min && `${Math.round(d.temperature_2m_min[0])}–${Math.round(d.temperature_2m_max[0])}°`,
+      text,
+      d.precipitation_probability_max && d.precipitation_probability_max[0] != null && `${d.precipitation_probability_max[0]} % regn`,
+    ].filter(Boolean);
+    el("nowWx").replaceChildren(temp, make("div", parts.join(" · "), "wx-sub"));
+  }
+
+  // ---------- dage og program ----------
+  function renderDays() {
+    const nav = el("days");
+    nav.replaceChildren();
+    const today = todayIso();
+    for (const iso of DAYS) {
+      const d = localDate(iso);
+      const b = make("button");
+      b.type = "button";
+      b.dataset.day = iso;
+      if (iso === today) b.classList.add("today");
+      b.append(make("span", WEEKDAYS[d.getDay()].slice(0, 3)), make("b", String(d.getDate())));
+      b.addEventListener("click", () => selectDay(iso));
+      nav.append(b);
+    }
+    let saved = null;
+    try { saved = sessionStorage.getItem(DAY_KEY); } catch (e) {}
+    selectDay(DAYS.includes(saved) ? saved : DAYS.includes(today) ? today : DAYS[0], false);
+  }
+
+  function selectDay(iso, switchTab = true) {
+    currentDay = iso;
+    try { sessionStorage.setItem(DAY_KEY, iso); } catch (e) {}
+    if (switchTab) selectTab("program");
+    for (const b of el("days").children) b.setAttribute("aria-pressed", String(b.dataset.day === iso));
+    el("day-title").textContent = dayLabel(iso);
+    const stay = hotelFor(iso);
+    el("tonight").hidden = !stay;
+    el("tonight").replaceChildren();
+    if (stay) el("tonight").append("Hotel i nat:", make("b", stay.name), stay.city ? `· ${stay.city}` : "");
+
+    // Fly og programpunkter i tidsrækkefølge; punkter uden tid først.
+    const entries = [
+      ...flights.filter((f) => f.day === iso).map((f) => ({ sort: minutesOf(f.departs), node: flightCard(f) })),
+      ...schedule.filter((i) => i.day === iso).map((i) => ({ sort: minutesOf(i.time), node: itemRow(i) })),
+    ].sort((a, b) => a.sort - b.sort);
+
+    const list = el("program");
+    list.replaceChildren();
+    if (!entries.length) list.append(make("li", "Intet program for denne dag endnu.", "empty"));
+    for (const e of entries) {
+      const li = make("li");
+      li.append(e.node);
+      list.append(li);
+    }
+  }
+
+  function itemRow(i) {
+    const row = make("div", null, "item");
+    row.append(make("div", i.time || "", "time"));
+    const body = make("div");
+    body.append(make("div", i.title, "title"));
+    if (i.details) body.append(make("div", i.details, "details"));
+    row.append(body);
+    if (isAdmin) {
+      row.classList.add("editable");
+      row.onclick = () => editItem(i);
+    }
+    return row;
+  }
+
+  function flightCard(f) {
+    const card = make("div", null, "flight");
+    const head = make("div", null, "flight-head");
+    head.append(make("span", `✈ ${f.from_place} → ${f.to_place}`), make("span", f.flight_no, "flight-no"));
+    card.append(head);
+    if (f.departs || f.arrives) {
+      const times = make("div", null, "flight-times");
+      times.append(document.createTextNode(f.departs || "?"), make("span", "→"), document.createTextNode(f.arrives || "?"));
+      card.append(times);
+    }
+    const meta = [
+      f.booking_ref && `Booking: ${f.booking_ref}`,
+      f.passengers && `Med: ${f.passengers}`,
+      f.notes,
+    ].filter(Boolean);
+    for (const m of meta) card.append(make("div", m, "flight-meta"));
+    card.classList.add("editable");
+    card.onclick = () => openFlightMenu(f);
+    return card;
+  }
+
+  function renderAllFlights() {
+    const box = el("all-flights");
+    box.replaceChildren();
+    if (!flights.length) box.append(make("p", "Ingen fly endnu.", "empty"));
+    let lastDay = null;
+    for (const f of [...flights].sort((a, b) => a.day.localeCompare(b.day) || minutesOf(a.departs) - minutesOf(b.departs))) {
+      if (f.day !== lastDay) box.append(make("div", dayLabel(f.day), "flight-day"));
+      lastDay = f.day;
+      box.append(flightCard(f));
+    }
+  }
+
+  // ---------- hoteller ----------
+  const hotelFor = (iso) => hotels.find((h) => h.check_in <= iso && iso < h.check_out);
+  const shortDate = (iso) => { const d = localDate(iso); return `${WEEKDAYS[d.getDay()].slice(0, 3)} ${d.getDate()}/${d.getMonth() + 1}`; };
+
+  function renderHotels() {
+    const box = el("hotels");
+    box.replaceChildren();
+    if (!hotels.length) box.append(make("p", "Ingen hoteller endnu.", "empty"));
+    for (const h of hotels) {
+      const div = make("div", null, "hotel");
+      if (h.city) div.append(make("div", h.city, "hotel-city"));
+      div.append(make("div", h.name, "hotel-name"));
+      div.append(make("div", `Check-in ${shortDate(h.check_in)} · check-ud ${shortDate(h.check_out)}`, "hotel-dates"));
+      if (h.address) div.append(make("div", h.address, "hotel-meta"));
+      for (const m of [h.booking_ref && `Booking: ${h.booking_ref}`, h.notes].filter(Boolean)) {
+        div.append(make("div", m, "hotel-meta"));
+      }
+      const buttons = make("div", null, "buttons");
+      if (h.link && /^https:\/\//.test(h.link)) {
+        const booking = make("a", "Booking");
+        booking.href = h.link;
+        booking.target = "_blank";
+        booking.rel = "noopener";
+        buttons.append(booking);
+      }
+      if (h.address) {
+        const map = make("a", "Kort");
+        map.href = "https://www.google.com/maps/search/?api=1&query=" +
+          encodeURIComponent([h.name, h.address, h.city].filter(Boolean).join(", "));
+        map.target = "_blank";
+        map.rel = "noopener";
+        if (buttons.children.length) map.className = "secondary";
+        buttons.append(map);
+      }
+      if (h.phone) {
+        const call = make("a", "Ring", "secondary");
+        call.href = "tel:" + h.phone.replace(/[^\d+]/g, "");
+        buttons.append(call);
+      }
+      if (buttons.children.length) div.append(buttons);
+      if (isAdmin) {
+        const edit = make("button", "Ret hotel", "link");
+        edit.type = "button";
+        edit.onclick = () => editHotel(h);
+        div.append(edit);
+      }
+      box.append(div);
+    }
+  }
+
+  // ---------- kontakter og info ----------
+  function renderContacts() {
+    const box = el("contacts");
+    box.replaceChildren();
+    if (!contacts.length) box.append(make("p", "Ingen kontakter endnu.", "empty"));
+    for (const c of contacts) {
+      const div = make("div", null, "contact");
+      div.append(make("div", c.role ? `${c.name}, ${c.role}` : c.name, "contact-name"));
+      if (c.phone) {
+        const digits = c.phone.replace(/[^\d+]/g, "");
+        div.append(make("div", c.phone, "contact-phone"));
+        const buttons = make("div", null, "buttons");
+        const call = make("a", "Ring");
+        call.href = "tel:" + digits;
+        const wa = make("a", "WhatsApp", "secondary");
+        wa.href = "https://wa.me/" + digits.replace("+", "");
+        buttons.append(call, wa);
+        div.append(buttons);
+      }
+      if (isAdmin) {
+        const edit = make("button", "Ret kontakt", "link");
+        edit.type = "button";
+        edit.onclick = () => editContact(c);
+        div.append(edit);
+      }
+      box.append(div);
+    }
+  }
+
+  function renderSections() {
+    const box = el("private-sections");
+    box.replaceChildren();
+    if (loadError) box.append(make("p", "Kunne ikke hente alle oplysninger. Tjek forbindelsen og prøv igen.", "empty"));
+    for (const s of sections) {
+      const section = make("section");
+      section.append(make("h2", s.title));
+      const ul = make("ul");
+      for (const item of s.items) ul.append(make("li", item));
+      section.append(ul);
+      if (isAdmin) {
+        const edit = make("button", "Ret afsnit", "link");
+        edit.type = "button";
+        edit.onclick = () => editSection(s);
+        section.append(edit);
+      }
+      box.append(section);
+    }
+  }
+
+  // ---------- faner ----------
+  const TABS = ["program", "fly", "hotel", "kontakter", "info"];
+  function selectTab(name) {
+    try { sessionStorage.setItem(TAB_KEY, name); } catch (e) {}
+    for (const b of el("tabs").children) b.setAttribute("aria-selected", String(b.dataset.tab === name));
+    for (const t of TABS) el("tab-" + t).hidden = t !== name;
+  }
+  for (const b of el("tabs").children) b.addEventListener("click", () => { selectTab(b.dataset.tab); scrollTo(0, 0); });
+
+  // ---------- redigering (kun admin) ----------
+  // Felter: [navn, label, type, hint]. Værdier gemmes som tekst; tomme felter bliver null.
+  let onSave = null, onDelete = null;
+  function openEditor(title, fields, values, save, del) {
+    el("editTitle").textContent = title;
+    const box = el("editFields");
+    box.replaceChildren();
+    for (const [name, label, type, hint] of fields) {
+      const wrap = make("div", null, "mt");
+      const l = make("label", label, "f");
+      l.htmlFor = "e-" + name;
+      let input;
+      if (type === "day") {
+        input = make("select", null, "field");
+        for (const d of DAYS) {
+          const o = make("option", dayLabel(d));
+          o.value = d;
+          input.append(o);
+        }
+      } else if (type === "date") {
+        input = make("input", null, "field");
+        input.type = "date";
+      } else if (type === "textarea") {
+        input = make("textarea", null, "field");
+      } else {
+        input = make("input", null, "field");
+      }
+      input.id = "e-" + name;
+      input.name = name;
+      input.value = values[name] ?? "";
+      wrap.append(l, input);
+      if (hint) wrap.append(make("p", hint, "hint"));
+      box.append(wrap);
+    }
+    el("editErr").textContent = "";
+    el("editDelete").hidden = !del;
+    onSave = save;
+    onDelete = del;
+    el("editor").showModal();
+  }
+
+  function formValues() {
+    const out = {};
+    for (const input of el("editFields").querySelectorAll("[name]")) {
+      const v = input.value.trim();
+      out[input.name] = v === "" ? null : v;
+    }
+    return out;
+  }
+
+  async function run(action) {
+    el("editSave").disabled = true;
+    const { error } = await action();
+    el("editSave").disabled = false;
+    if (error) {
+      el("editErr").textContent = "Blev ikke gemt – prøv igen.";
+      return;
+    }
+    el("editor").close();
+    await loadData();
+  }
+
+  el("editForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const values = formValues();
+    const missing = [...el("editFields").querySelectorAll("[name][data-required]")].find((i) => !i.value.trim());
+    if (missing) { el("editErr").textContent = "Udfyld de påkrævede felter."; return; }
+    run(() => onSave(values));
+  });
+  el("editCancel").onclick = () => el("editor").close();
+  el("editDelete").onclick = () => { if (confirm("Vil du slette det?")) run(() => onDelete()); };
+
+  function requireFields(...names) {
+    for (const n of names) el("e-" + n)?.setAttribute("data-required", "");
+  }
+
+  const ITEM_FIELDS = [
+    ["day", "Dag", "day"],
+    ["time", "Tid", "text", "Fx 17:30. Lokal tid (GMT+5), skriv DK eller TR efter tiden ved anden tidszone."],
+    ["title", "Hvad", "text"],
+    ["details", "Detaljer", "textarea"],
+  ];
+  function editItem(i) {
+    const table = db.from("schedule_items");
+    openEditor(i ? "Ret programpunkt" : "Nyt programpunkt", ITEM_FIELDS, i || { day: currentDay },
+      (v) => i ? table.update(v).eq("id", i.id) : table.insert(v),
+      i && (() => table.delete().eq("id", i.id)));
+    requireFields("title");
+  }
+
+  const FLIGHT_FIELDS = [
+    ["day", "Dag (afgang)", "day"],
+    ["from_place", "Fra", "text"],
+    ["to_place", "Til", "text"],
+    ["departs", "Afgang", "text", "Fx 14:55 DK. Uden zone betyder lokal tid (GMT+5)."],
+    ["arrives", "Ankomst", "text", "Fx 19:15 TR."],
+    ["flight_no", "Flynummer", "text", "Fx KC 124."],
+    ["airline", "Flyselskab", "text", "Fx Air Astana."],
+    ["booking_ref", "Bookingnummer", "text"],
+    ["checkin_url", "Link til online check-in", "text", "Fx https://airastana.com"],
+    ["passengers", "Hvem er med", "text"],
+    ["notes", "Noter", "textarea", "Fx check-in, afgang fra hotel, terminal."],
+  ];
+  function editFlight(f) {
+    const table = db.from("flights");
+    openEditor(f ? "Ret fly" : "Nyt fly", FLIGHT_FIELDS, f || { day: currentDay },
+      (v) => f ? table.update(v).eq("id", f.id) : table.insert(v),
+      f && (() => table.delete().eq("id", f.id)));
+    requireFields("from_place", "to_place");
+  }
+
+  // ---------- fly-menu og check-in-hjælp ----------
+  function openFlightMenu(f) {
+    el("fmTitle").textContent = `✈ ${f.from_place} → ${f.to_place}`;
+    el("fmEdit").hidden = !isAdmin;
+    el("fmCheckin").onclick = () => { el("flightMenu").close(); openCheckin(f); };
+    el("fmEdit").onclick = () => { el("flightMenu").close(); editFlight(f); };
+    el("flightMenu").showModal();
+  }
+  el("fmClose").onclick = () => el("flightMenu").close();
+  el("ciClose").onclick = () => el("checkin").close();
+
+  async function copyText(text, button) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const t = make("textarea");
+      t.value = text;
+      document.body.append(t);
+      t.select();
+      document.execCommand("copy");
+      t.remove();
+    }
+    button.textContent = "Kopieret";
+    button.classList.add("done");
+    setTimeout(() => { button.textContent = "Kopiér"; button.classList.remove("done"); }, 1500);
+  }
+
+  function copyRow(label, value) {
+    const row = make("div", null, "ci-row");
+    const text = make("div");
+    text.append(make("div", label, "k"), make("div", value, "v"));
+    const b = make("button", "Kopiér", "copy");
+    b.type = "button";
+    b.onclick = () => copyText(value, b);
+    row.append(text, b);
+    return row;
+  }
+
+  const TICKET_ROWS = [
+    ["ticket_no", "Billetnummer"],
+    ["last_name", "Efternavn"],
+    ["first_name", "Fornavn"],
+    ["passport_no", "Pasnummer"],
+    ["seat", "Sæde"],
+    ["baggage", "Bagage"],
+  ];
+
+  async function openCheckin(f) {
+    el("ciTitle").textContent = `✈ ${f.from_place} → ${f.to_place}`;
+    el("ciSub").textContent = [dayLabel(f.day), f.departs && `afgang ${f.departs}`, f.airline].filter(Boolean).join(" · ");
+    const body = el("ciBody");
+    body.replaceChildren(make("p", "Henter…", "empty"));
+    if (!el("checkin").open) el("checkin").showModal();
+
+    // RLS: almindelige brugere får kun deres egen billet, admins får alle.
+    const { data, error } = await db.from("flight_tickets")
+      .select("id, username, last_name, first_name, ticket_no, passport_no, seat, baggage, notes")
+      .eq("flight_id", f.id).order("username");
+    body.replaceChildren();
+    if (f.booking_ref) body.append(copyRow("Bookingnummer", f.booking_ref));
+    if (f.flight_no) body.append(copyRow("Flynummer", f.flight_no));
+
+    const tickets = data || [];
+    if (error) body.append(make("p", "Kunne ikke hente billetter – prøv igen.", "empty"));
+    else if (!tickets.length) body.append(make("p", "Din billet er ikke lagt ind endnu. Spørg Luke.", "empty mt"));
+    for (const t of tickets) {
+      if (isAdmin) body.append(make("div", capital(t.username), "ci-person"));
+      for (const [key, label] of TICKET_ROWS) if (t[key]) body.append(copyRow(label, t[key]));
+      if (t.notes) body.append(make("p", t.notes, "flight-meta"));
+      if (isAdmin) {
+        const edit = make("button", `Ret billet (${t.username})`, "link");
+        edit.type = "button";
+        edit.onclick = () => editTicket(f, t);
+        body.append(edit);
+      }
+    }
+    if (f.checkin_url && /^https:\/\//.test(f.checkin_url)) {
+      const a = make("a", "Åbn online check-in", "btn ci-link");
+      a.href = f.checkin_url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      body.append(a);
+    }
+    if (isAdmin) {
+      const add = make("button", "+ Tilføj billet", "add");
+      add.type = "button";
+      add.onclick = () => editTicket(f, null);
+      body.append(add);
+    }
+  }
+
+  const TICKET_FIELDS = [
+    ["username", "Bruger", "text", "Brugernavnet i appen, fx lenny. Kun den bruger (og admins) kan se billetten."],
+    ["last_name", "Efternavn (som på billetten)", "text"],
+    ["first_name", "Fornavn", "text"],
+    ["ticket_no", "Billetnummer", "text"],
+    ["passport_no", "Pasnummer", "text"],
+    ["seat", "Sæde", "text"],
+    ["baggage", "Bagage", "text"],
+    ["notes", "Noter", "textarea"],
+  ];
+  function editTicket(f, t) {
+    const table = db.from("flight_tickets");
+    const reopen = async (request) => {
+      const result = await request;
+      if (!result.error) setTimeout(() => openCheckin(f), 0);
+      return result;
+    };
+    openEditor(t ? "Ret billet" : "Ny billet", TICKET_FIELDS, t || {},
+      (v) => reopen(t
+        ? table.update({ ...v, username: (v.username || "").toLowerCase() }).eq("id", t.id)
+        : table.insert({ ...v, username: (v.username || "").toLowerCase(), flight_id: f.id })),
+      t && (() => reopen(table.delete().eq("id", t.id))));
+    requireFields("username");
+  }
+
+  const CONTACT_FIELDS = [
+    ["name", "Navn", "text"],
+    ["role", "Rolle", "text", "Fx hovedkontakt, chauffør, promotor."],
+    ["phone", "Telefon", "text", "Med landekode, fx +45 12 34 56 78."],
+  ];
+  function editContact(c) {
+    const table = db.from("contacts");
+    openEditor(c ? "Ret kontakt" : "Ny kontakt", CONTACT_FIELDS, c || {},
+      (v) => c ? table.update(v).eq("id", c.id) : table.insert({ ...v, position: contacts.length + 1 }),
+      c && (() => table.delete().eq("id", c.id)));
+    requireFields("name");
+  }
+
+  const SECTION_FIELDS = [
+    ["title", "Overskrift", "text"],
+    ["items", "Punkter", "textarea", "Ét punkt pr. linje."],
+  ];
+  function editSection(s) {
+    const table = db.from("private_sections");
+    const toRow = (v) => ({ title: v.title, items: (v.items || "").split("\n").map((x) => x.trim()).filter(Boolean) });
+    openEditor(s ? "Ret afsnit" : "Nyt afsnit", SECTION_FIELDS, s ? { title: s.title, items: s.items.join("\n") } : {},
+      (v) => s
+        ? table.update(toRow(v)).eq("slug", s.slug)
+        : table.insert({ ...toRow(v), slug: "afsnit-" + Date.now(), position: sections.length + 1 }),
+      s && (() => table.delete().eq("slug", s.slug)));
+    requireFields("title");
+    el("e-items").rows = 8;
+  }
+
+  const HOTEL_FIELDS = [
+    ["city", "By", "text"],
+    ["name", "Hotel", "text"],
+    ["check_in", "Check-in", "date"],
+    ["check_out", "Check-ud", "date"],
+    ["address", "Adresse", "text"],
+    ["phone", "Telefon", "text"],
+    ["booking_ref", "Bookingnummer", "text"],
+    ["link", "Link til booking", "text", "Fx et Booking.com-link."],
+    ["notes", "Noter", "textarea", "Fx værelser, morgenmad, wifi."],
+  ];
+  function editHotel(h) {
+    const table = db.from("hotels");
+    openEditor(h ? "Ret hotel" : "Nyt hotel", HOTEL_FIELDS, h || { check_in: currentDay },
+      (v) => h ? table.update(v).eq("id", h.id) : table.insert(v),
+      h && (() => table.delete().eq("id", h.id)));
+    requireFields("name", "check_in", "check_out");
+  }
+
+  el("add-hotel").onclick = () => editHotel(null);
+  el("add-section").onclick = () => editSection(null);
+  el("add-item").onclick = () => editItem(null);
+  el("add-flight").onclick = () => editFlight(null);
+  el("add-flight-day").onclick = () => editFlight(null);
+  el("add-contact").onclick = () => editContact(null);
+
+  // ---------- login ----------
+  function showLogin() {
+    el("app").hidden = true;
+    el("tabs").hidden = true;
+    el("login").hidden = false;
+    let saved = null;
+    try { saved = localStorage.getItem(USERNAME_KEY); } catch (e) {}
+    if (saved && !el("lUser").value) {
+      el("lUser").value = saved;
+      el("lPass").focus();
+    }
+  }
+
+  async function showApp() {
+    el("login").hidden = true;
+    el("app").hidden = false;
+    el("tabs").hidden = false;
+    let tab = null;
+    try { tab = sessionStorage.getItem(TAB_KEY); } catch (e) {}
+    selectTab(TABS.includes(tab) ? tab : "program");
+    renderAll();
+    await loadData();
+  }
+
+  el("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = el("lUser").value.trim().toLowerCase();
+    const password = el("lPass").value;
+    el("lErr").textContent = "";
+    el("lLogin").disabled = true;
+    try {
+      if (el("lRemember").checked) localStorage.setItem(USERNAME_KEY, name);
+      else localStorage.removeItem(USERNAME_KEY);
+    } catch (e) {}
+    const { error } = await db.auth.signInWithPassword({ email: `${name}@${EMAIL_DOMAIN}`, password });
+    el("lLogin").disabled = false;
+    if (error) {
+      el("lErr").textContent = /invalid/i.test(error.message)
+        ? "Forkert brugernavn eller password"
+        : "Kunne ikke logge på – prøv igen";
+      return;
+    }
+    el("lPass").value = "";
+  });
+
+  el("logout").addEventListener("click", () => db.auth.signOut());
+
+  db.auth.onAuthStateChange((_event, session) => {
+    // Kør uden for callbacken, så supabase-js ikke låser sig selv.
+    setTimeout(() => (session ? showApp() : showLogin()), 0);
+  });
+</script>
+</body>
+</html>
